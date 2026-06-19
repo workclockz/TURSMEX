@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TURSMEX</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --c1: #ff006e;
+      --c2: #8338ec;
+      --c3: #3a86ff;
+      --c4: #06d6a0;
+      --c5: #ffbe0b;
+      --bg: #080808;
+      --fg: #f0f0f0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Animated gradient orbs background */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      animation: drift 12s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .bg-orb:nth-child(1) { width: 500px; height: 500px; background: var(--c1); top: -100px; left: -100px; animation-duration: 11s; }
+    .bg-orb:nth-child(2) { width: 400px; height: 400px; background: var(--c2); top: 50%; right: -80px; animation-duration: 13s; animation-delay: -3s; }
+    .bg-orb:nth-child(3) { width: 350px; height: 350px; background: var(--c3); bottom: -80px; left: 30%; animation-duration: 9s; animation-delay: -6s; }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.08); }
+    }
+
+    /* Grid lines */
+    .grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .container {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      padding: 40px 24px;
+    }
+
+    /* Title */
+    .title {
+      font-size: clamp(48px, 10vw, 96px);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--c1), var(--c2), var(--c3), var(--c4), var(--c5));
+      background-size: 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 5s ease infinite;
+      text-align: center;
+    }
+
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .subtitle {
+      font-size: 14px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-top: -24px;
+    }
+
+    /* Button */
+    .btn-wrap {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .btn {
+      position: relative;
+      padding: 20px 56px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #fff;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      z-index: 2;
+      transition: transform 0.2s, letter-spacing 0.2s;
+    }
+
+    .btn:hover { transform: scale(1.04); letter-spacing: 4px; }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-border {
+      position: absolute;
+      inset: 0;
+      border-radius: 4px;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--c1), var(--c2), var(--c3), var(--c4));
+      background-size: 300%;
+      animation: gradientShift 3s ease infinite;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
+    }
+
+    /* Water fill on hover */
+    .btn-water {
+      position: absolute;
+      inset: 2px;
+      border-radius: 3px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .water-fill {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 0%;
+      background: linear-gradient(135deg, rgba(131,56,236,0.4), rgba(58,134,255,0.4));
+      transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 0 0 2px 2px;
+    }
+
+    .btn-wrap:hover .water-fill { height: 100%; }
+
+    /* Water wave on top */
+    .water-fill::before {
+      content: '';
+      position: absolute;
+      top: -8px; left: -50%;
+      width: 200%; height: 20px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 40%;
+      animation: wave 1.5s linear infinite;
+    }
+
+    @keyframes wave {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Status area */
+    .status {
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .status-text {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: all 0.4s;
+    }
+
+    .status-text.active { color: rgba(255,255,255,0.9); }
+
+    /* Progress steps */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 320px;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .steps.visible { opacity: 1; }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+      transition: color 0.4s;
+    }
+    .step.done { color: var(--c4); }
+    .step.active { color: #fff; }
+
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      flex-shrink: 0;
+      transition: background 0.4s;
+    }
+    .step.done .step-dot { background: var(--c4); }
+    .step.active .step-dot {
+      background: var(--c3);
+      box-shadow: 0 0 8px var(--c3);
+      animation: pulse 1s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.7; }
+    }
+
+    /* Invite result */
+    .invite-card {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 28px 36px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(10px);
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .invite-label {
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .invite-link {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--c3), var(--c4));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .copy-btn {
+      padding: 10px 28px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #fff;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.12); transform: scale(1.03); }
+    .copy-btn.copied { border-color: var(--c4); color: var(--c4); }
+
+    .success-note {
+      font-size: 12px;
+      color: rgba(255,255,255,0.25);
+      text-align: center;
+      max-width: 280px;
+      line-height: 1.6;
+    }
+
+    /* Error */
+    .error-msg {
+      color: var(--c1);
+      font-size: 13px;
+      text-align: center;
+      max-width: 300px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="grid"></div>
+
+  <div class="container">
+    <div class="title">TURSMEX</div>
+    <div class="subtitle">Server Generator</div>
+
+    <div class="btn-wrap" id="btnWrap">
+      <div class="btn-border"></div>
+      <div class="btn-water"><div class="water-fill"></div></div>
+      <button class="btn" id="createBtn" onclick="createServer()">Create TURSMEX Server</button>
+    </div>
+
+    <div class="status">
+      <div class="status-text" id="statusText">Click to generate your server</div>
+
+      <div class="steps" id="steps">
+        <div class="step" id="s1"><div class="step-dot"></div>Connecting to Discord</div>
+        <div class="step" id="s2"><div class="step-dot"></div>Creating TURSMEX server</div>
+        <div class="step" id="s3"><div class="step-dot"></div>Building 10 channels</div>
+        <div class="step" id="s4"><div class="step-dot"></div>Sending welcome messages</div>
+        <div class="step" id="s5"><div class="step-dot"></div>Generating invite link</div>
+      </div>
+
+      <div class="invite-card" id="inviteCard">
+        <div class="invite-label">Your permanent invite</div>
+        <a class="invite-link" id="inviteLink" target="_blank"></a>
+        <button class="copy-btn" id="copyBtn" onclick="copyInvite()">Copy Link</button>
+        <div class="success-note">Share this with your friend — the link never expires. Transfer ownership in Discord: Server Settings → Members → ⋯ → Transfer Ownership.</div>
+      </div>
+
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+  </div>
+
+  <script>
+    let inviteUrl = '';
+
+    async function createServer() {
+      const btn = document.getElementById('createBtn');
+      const statusText = document.getElementById('statusText');
+      const steps = document.getElementById('steps');
+      const inviteCard = document.getElementById('inviteCard');
+      const errorMsg = document.getElementById('errorMsg');
+
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      errorMsg.style.display = 'none';
+      inviteCard.style.display = 'none';
+
+      statusText.textContent = 'Working...';
+      statusText.classList.add('active');
+      steps.classList.add('visible');
+
+      const stepIds = ['s1','s2','s3','s4','s5'];
+      const delays = [0, 800, 1800, 3200, 4500];
+
+      stepIds.forEach((id, i) => {
+        setTimeout(() => {
+          if (i > 0) document.getElementById(stepIds[i-1]).className = 'step done';
+          document.getElementById(id).className = 'step active';
+        }, delays[i]);
+      });
+
+      try {
+        const res = await fetch('/create', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        const data = await res.json();
+
+        // Mark all done
+        stepIds.forEach(id => document.getElementById(id).className = 'step done');
+
+        if (data.success) {
+          inviteUrl = data.invite;
+          statusText.textContent = 'Server ready!';
+          document.getElementById('inviteLink').textContent = data.invite;
+          document.getElementById('inviteLink').href = data.invite;
+          inviteCard.style.display = 'flex';
+        } else {
+          throw new Error(data.error);
+        }
+      } catch (err) {
+        statusText.textContent = 'Something went wrong';
+        statusText.classList.remove('active');
+        errorMsg.textContent = err.message || 'Could not create server. Check your bot token and permissions.';
+        errorMsg.style.display = 'block';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    }
+
+    function copyInvite() {
+      navigator.clipboard.writeText(inviteUrl).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy Link'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
